@@ -20,12 +20,3 @@ Local:
 
 ```bash
 npx --yes serve .
-```
-
-## Flow
-
-1. Naam daal ke group me aao.
-2. Challenge: game + mode. Amount nahi.
-3. Doosra player Accept.
-4. Creator room code paste kare. Opponent Copy dabaye.
-5. 15 minute timer, phir Complete.
