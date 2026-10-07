@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>JokerLudo — room chat</title>
+<title>JokerLudo — Multi-Feature & Coin System</title>
 <style>
   :root {
     --ink: #100c14;
@@ -11,9 +11,11 @@
     --line: #3a3148;
     --text: #f7f3fb;
     --muted: #b3a8c2;
-    --green: #6d28d9;
+    --purple: #6d28d9;
     --mint: #c4b5fd;
     --gold: #f0c14d;
+    --green: #22c55e;
+    --red: #ef4444;
     --me: #4c1d95;
   }
   * { box-sizing: border-box; }
@@ -21,51 +23,70 @@
   button, input, select { font: inherit; color: inherit; }
   button { cursor: pointer; }
   #app { max-width: 480px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; background: #16111e; position: relative; }
+  
   .gate { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 28px; gap: 14px; }
   .mark { width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(145deg, #6d28d9, #f0c14d); display: grid; place-items: center; font-weight: 800; font-size: 28px; color: #1a1024; }
-  h1 { margin: 8px 0 0; font-size: 32px; letter-spacing: -0.04em; }
-  p.lead { margin: 0; color: var(--muted); line-height: 1.45; }
+  h1 { margin: 8px 0 0; font-size: 30px; letter-spacing: -0.04em; }
+  p.lead { margin: 0; color: var(--muted); line-height: 1.45; font-size: 14px; }
   label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
   input, select { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; outline: none; }
   input:focus, select:focus { border-color: var(--mint); }
-  .btn { border: 0; border-radius: 12px; padding: 12px 14px; background: var(--green); color: white; font-weight: 700; }
+  
+  .btn { border: 0; border-radius: 12px; padding: 12px 14px; background: var(--purple); color: white; font-weight: 700; width: 100%; text-align: center; }
   .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--text); }
   .btn.gold { background: var(--gold); color: #1c1406; }
-  .btn.small { padding: 8px 10px; border-radius: 10px; font-size: 13px; }
-  header.top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: #1b1524; }
+  .btn.green { background: var(--green); color: white; }
+  .btn.red { background: var(--red); color: white; }
+  .btn.small { padding: 6px 10px; border-radius: 8px; font-size: 12px; width: auto; }
+  
+  header.top { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line); background: #1b1524; }
+  .user-info { display: flex; align-items: center; gap: 10px; }
   .ava { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: #3b2a55; font-weight: 700; }
-  .top h2 { margin: 0; font-size: 16px; }
+  .top h2 { margin: 0; font-size: 15px; }
   .top small { color: var(--muted); }
-  main { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .wallet-badge { background: #281d38; border: 1px solid var(--gold); padding: 6px 12px; border-radius: 20px; color: var(--gold); font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+  
+  main { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
   .sys { align-self: center; background: #2c2438; color: #ddd4ea; font-size: 12px; padding: 6px 10px; border-radius: 10px; max-width: 90%; text-align: center; }
-  .err { align-self: center; background: #3a2228; color: #f3c2c2; font-size: 12px; padding: 8px 10px; border-radius: 10px; }
-  .bubble { max-width: 78%; padding: 8px 10px; border-radius: 12px; background: var(--card); }
+  .err { align-self: center; background: #3a2228; color: #f3c2c2; font-size: 12px; padding: 8px 10px; border-radius: 10px; width: 100%; text-align: center; }
+  
+  .bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--card); }
   .bubble.me { align-self: flex-end; background: var(--me); }
   .bubble .who { font-size: 11px; color: var(--gold); margin-bottom: 2px; }
   .bubble .time { display: block; text-align: right; font-size: 10px; color: #d5cbe4; margin-top: 4px; }
+  
   .card { background: linear-gradient(180deg, #322848, #221c2c); border: 1px solid #5b4780; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-  .card .tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
-  .row { display: flex; gap: 8px; align-items: center; }
-  .code { font-family: ui-monospace, monospace; letter-spacing: 0.14em; font-size: 20px; background: #120e18; border-radius: 10px; padding: 8px 10px; flex: 1; }
+  .card .tag { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); font-weight: bold; }
+  .row { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  .code { font-family: ui-monospace, monospace; letter-spacing: 0.14em; font-size: 18px; background: #120e18; border-radius: 10px; padding: 8px 10px; flex: 1; text-align: center; }
   .timer { color: var(--mint); font-variant-numeric: tabular-nums; font-weight: 700; }
+  
   .composer { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); background: #1b1524; }
   .composer input { flex: 1; }
-  nav.bot { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); background: #140f1c; }
-  nav.bot button { background: transparent; border: 0; padding: 10px 4px 12px; color: var(--muted); font-size: 12px; }
-  nav.bot button.on { color: var(--mint); }
-  .sheet { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; }
-  .sheet form { width: 100%; background: #211a2c; border-radius: 18px 18px 0 0; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .list-item { background: var(--card); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-  .pill { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #3a2d52; color: var(--mint); width: fit-content; }
+  
+  nav.bot { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); background: #140f1c; }
+  nav.bot button { background: transparent; border: 0; padding: 10px 4px 12px; color: var(--muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav.bot button.on { color: var(--mint); font-weight: bold; }
+  
+  .sheet { position: absolute; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: flex-end; z-index: 10; }
+  .sheet form, .sheet .modal-body { width: 100%; background: #211a2c; border-radius: 18px 18px 0 0; padding: 18px; display: flex; flex-direction: column; gap: 12px; max-height: 85vh; overflow-y: auto; }
+  
+  .list-item { background: var(--card); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); }
+  .pill { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: #3a2d52; color: var(--mint); width: fit-content; font-weight: 600; }
+  .pill.pending { background: #52431b; color: var(--gold); }
+  .pill.approved { background: #1b522a; color: #86efac; }
+  .pill.rejected { background: #521b22; color: #fca5a5; }
   .note { font-size: 12px; color: var(--muted); }
+  .admin-badge { background: var(--red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 </style>
 </head>
 <body>
 <div id="app"></div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import {
-  getFirestore, collection, doc, setDoc, addDoc, onSnapshot, serverTimestamp, query, orderBy
+  getFirestore, collection, doc, setDoc, addDoc, getDoc, updateDoc, onSnapshot, serverTimestamp, query, orderBy, increment
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -79,9 +100,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 const GAMES = ["Ludo King", "Carrom", "Chess"];
 const MODES = ["Classic", "Quick", "Arrow"];
 const TIMER_MS = 15 * 60 * 1000;
+const ADMIN_PASS = "admin123"; // Admin Login Password
 
 let me = null;
 let tab = "chat";
@@ -90,6 +113,7 @@ let error = "";
 let messages = [];
 let matches = [];
 let members = [];
+let txList = [];
 
 function uid() {
   let id = localStorage.getItem("jokerludo_uid");
@@ -99,6 +123,7 @@ function uid() {
   }
   return id;
 }
+
 function esc(s) {
   return String(s ?? "").replace(/[&<>"]/g, (c) => {
     if (c === "&") return "&amp;";
@@ -107,10 +132,12 @@ function esc(s) {
     return "&quot;";
   });
 }
+
 function time(ts) {
   const ms = ts && ts.toMillis ? ts.toMillis() : Number(ts) || Date.now();
   return new Date(ms).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 }
+
 function remain(match) {
   const start = match.codeAt && match.codeAt.toMillis ? match.codeAt.toMillis() : Number(match.codeAt);
   if (!start) return "";
@@ -121,31 +148,64 @@ function remain(match) {
 }
 
 function listen() {
+  // Listen Chat
   onSnapshot(query(collection(db, "rooms", "main", "messages"), orderBy("at", "asc")), (snap) => {
     messages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     render();
   }, (e) => { error = e.message; render(); });
+
+  // Listen Matches
   onSnapshot(query(collection(db, "rooms", "main", "matches"), orderBy("createdAt", "desc")), (snap) => {
     matches = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     render();
   }, (e) => { error = e.message; render(); });
+
+  // Listen Active Online Users
   onSnapshot(collection(db, "rooms", "main", "members"), (snap) => {
     const now = Date.now();
     members = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((m) => now - (m.seen || 0) < 120000);
     render();
   });
+
+  // Listen User Profile (Coins)
+  onSnapshot(doc(db, "users", me.id), (docSnap) => {
+    if (docSnap.exists()) {
+      me.coins = docSnap.data().coins || 0;
+      me.role = docSnap.data().role || "user";
+      render();
+    }
+  });
+
+  // Listen Transactions
+  onSnapshot(query(collection(db, "transactions"), orderBy("at", "desc")), (snap) => {
+    txList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    render();
+  });
 }
 
-async function join(name) {
-  me = { id: uid(), name: name.slice(0, 24) };
+async function join(name, role = "user") {
+  me = { id: uid(), name: name.slice(0, 24), role: role, coins: 0 };
   localStorage.setItem("jokerludo_name", me.name);
+  
+  const userRef = doc(db, "users", me.id);
+  const userDoc = await getDoc(userRef);
+  
+  if (!userDoc.exists()) {
+    await setDoc(userRef, { name: me.name, coins: 100, role: role, createdAt: serverTimestamp() });
+  } else {
+    me.role = userDoc.data().role || role;
+    me.coins = userDoc.data().coins || 0;
+  }
+
   await setDoc(doc(db, "rooms", "main", "members", me.id), { name: me.name, seen: Date.now() });
   await addDoc(collection(db, "rooms", "main", "messages"), {
-    type: "system", text: me.name + " group me aaya.", at: serverTimestamp()
+    type: "system", text: me.name + (me.role === "admin" ? " (Admin)" : "") + " online aaya.", at: serverTimestamp()
   });
+
   setInterval(() => {
     setDoc(doc(db, "rooms", "main", "members", me.id), { name: me.name, seen: Date.now() }, { merge: true });
   }, 30000);
+
   listen();
 }
 
@@ -155,14 +215,21 @@ async function sendChat(text) {
   });
 }
 
-async function createChallenge(game, mode, note) {
+async function createChallenge(game, mode, coins, note) {
+  const coinAmt = Number(coins) || 0;
+  if (coinAmt > 0 && me.coins < coinAmt) {
+    alert("Aapke paas itne coins nahi hain!");
+    return;
+  }
+
   const ref = doc(collection(db, "rooms", "main", "matches"));
   await setDoc(ref, {
-    game, mode, note: note.slice(0, 80),
+    game, mode, coins: coinAmt, note: note.slice(0, 80),
     hostId: me.id, hostName: me.name,
     guestId: "", guestName: "", code: "", status: "open",
     createdAt: serverTimestamp(), codeAt: null
   });
+
   await addDoc(collection(db, "rooms", "main", "messages"), {
     type: "challenge", matchId: ref.id, at: serverTimestamp()
   });
@@ -170,9 +237,15 @@ async function createChallenge(game, mode, note) {
 
 async function accept(match) {
   if (match.status !== "open" || match.hostId === me.id) return;
+  if (match.coins > 0 && me.coins < match.coins) {
+    alert("Aapke paas entry coins nahi hain!");
+    return;
+  }
+
   await setDoc(doc(db, "rooms", "main", "matches", match.id), {
     status: "locked", guestId: me.id, guestName: me.name
   }, { merge: true });
+
   await addDoc(collection(db, "rooms", "main", "messages"), {
     type: "system", text: me.name + " ne " + match.hostName + " ka challenge accept kiya.", at: serverTimestamp()
   });
@@ -185,55 +258,139 @@ async function shareCode(match, code) {
     status: "live",
     codeAt: serverTimestamp()
   }, { merge: true });
+
   await addDoc(collection(db, "rooms", "main", "messages"), {
-    type: "system", text: "Room code live hai. Copy karke join karo. 15 min timer chalu.", at: serverTimestamp()
+    type: "system", text: "Room code live hai. Match shuru karein!", at: serverTimestamp()
   });
 }
 
 async function finish(match, status) {
-  if (match.hostId !== me.id && match.guestId !== me.id) return;
+  if (match.hostId !== me.id && match.guestId !== me.id && me.role !== "admin") return;
   await setDoc(doc(db, "rooms", "main", "matches", match.id), { status }, { merge: true });
+
   await addDoc(collection(db, "rooms", "main", "messages"), {
     type: "system",
-    text: status === "done" ? "Match complete mark hua." : me.name + " ne match cancel kiya.",
+    text: status === "done" ? "Match Complete mark ho gaya." : "Match cancel ho gaya.",
     at: serverTimestamp()
   });
+}
+
+// Wallet Functions: Deposit & Withdraw Request
+async function requestDeposit(amount, utr) {
+  await addDoc(collection(db, "transactions"), {
+    type: "deposit", userId: me.id, userName: me.name, amount: Number(amount), utr: utr, status: "pending", at: serverTimestamp()
+  });
+  alert("Deposit request bhej di gayi hai. Admin verify karega.");
+}
+
+async function requestWithdraw(amount, upi) {
+  if (me.coins < Number(amount)) {
+    alert("Insufficent Coins!");
+    return;
+  }
+  await addDoc(collection(db, "transactions"), {
+    type: "withdraw", userId: me.id, userName: me.name, amount: Number(amount), details: upi, status: "pending", at: serverTimestamp()
+  });
+  alert("Withdrawal request bhej di gayi hai.");
+}
+
+// Admin Operations
+async function processTx(tx, approve) {
+  if (me.role !== "admin") return;
+  const status = approve ? "approved" : "rejected";
+  
+  await updateDoc(doc(db, "transactions", tx.id), { status });
+
+  if (approve) {
+    const userRef = doc(db, "users", tx.userId);
+    if (tx.type === "deposit") {
+      await updateDoc(userRef, { coins: increment(tx.amount) });
+    } else if (tx.type === "withdraw") {
+      await updateDoc(userRef, { coins: increment(-tx.amount) });
+    }
+  }
 }
 
 function cardHtml(match) {
   const mine = match.hostId === me.id;
   let actions = "";
-  if (match.status === "open" && !mine) actions = `<button class="btn small" data-act="accept" data-id="${match.id}">Accept</button>`;
-  if (match.status === "open" && mine) actions = `<span class="note">Koi accept kare, tab room code daalna.</span>`;
+  
+  if (match.status === "open" && !mine) actions = `<button class="btn small gold" data-act="accept" data-id="${match.id}">Accept Match</button>`;
+  if (match.status === "open" && mine) actions = `<span class="note">Player ka intezar hai...</span>`;
   if (match.status === "locked" && mine) {
-    actions = `<div class="row"><input id="code-${match.id}" placeholder="Room code" maxlength="12" /><button class="btn small gold" data-act="code" data-id="${match.id}">Share</button></div>`;
+    actions = `<div class="row" style="gap:4px;"><input id="code-${match.id}" placeholder="Room code" maxlength="12" /><button class="btn small gold" data-act="code" data-id="${match.id}">Share</button></div>`;
   }
-  if (match.status === "locked" && !mine) actions = `<span class="note">Creator room code daal raha hai.</span>`;
+  if (match.status === "locked" && !mine) actions = `<span class="note">Host room code daal raha hai...</span>`;
   if (match.status === "live") {
     actions = `<div class="row"><div class="code">${esc(match.code)}</div><button class="btn small" data-act="copy" data-code="${esc(match.code)}">Copy</button></div>
-      <div class="row"><span class="timer" data-timer="${match.id}">${remain(match)}</span><span class="note">15 min</span></div>
-      <div class="row"><button class="btn small" data-act="done" data-id="${match.id}">Complete</button><button class="btn small ghost" data-act="cancel" data-id="${match.id}">Cancel</button></div>`;
+      <div class="row"><span class="timer" data-timer="${match.id}">${remain(match)}</span><span class="note">Timer</span></div>
+      <div class="row"><button class="btn small green" data-act="done" data-id="${match.id}">Complete</button><button class="btn small red" data-act="cancel" data-id="${match.id}">Cancel</button></div>`;
   }
-  const who = match.guestName ? match.hostName + " vs " + match.guestName : match.hostName + " · waiting";
-  return `<article class="card"><div class="tag">${esc(match.game)} · ${esc(match.mode)}</div><strong>${esc(who)}</strong>${match.note ? `<span class="note">${esc(match.note)}</span>` : ""}<span class="pill">${esc(match.status)}</span>${actions}</article>`;
+
+  const who = match.guestName ? match.hostName + " vs " + match.guestName : match.hostName + " (Waiting)";
+  return `<article class="card">
+    <div class="row">
+      <div class="tag">${esc(match.game)} · ${esc(match.mode)}</div>
+      <div style="color:var(--gold); font-weight:bold; font-size:13px;">🪙 ${match.coins || 0} Coins</div>
+    </div>
+    <strong>${esc(who)}</strong>
+    ${match.note ? `<span class="note">${esc(match.note)}</span>` : ""}
+    <div class="row"><span class="pill">${esc(match.status)}</span>${actions}</div>
+  </article>`;
 }
 
 function render() {
   const root = document.getElementById("app");
+
+  // LOGIN SCREEN
   if (!me) {
-    root.innerHTML = `<div class="gate"><div class="mark">J</div><h1>JokerLudo</h1>
-      <p class="lead">Group chat jahan room code share hota hai. Firebase pe real-time. Koi stake nahi, koi wallet nahi.</p>
-      <div><label>Tumhara naam</label><input id="name" maxlength="24" placeholder="Rohit" /></div>
-      <button class="btn" id="go">Group me jao</button>
-      ${error ? `<div class="err">${esc(error)}</div>` : ""}</div>`;
+    root.innerHTML = `<div class="gate">
+      <div class="mark">J</div>
+      <h1>JokerLudo</h1>
+      <p class="lead">Room code sharing, Chat & Coin Management App.</p>
+      
+      <div>
+        <label>Aapka Naam</label>
+        <input id="name" maxlength="24" placeholder="Ex. Rahul" />
+      </div>
+      
+      <div>
+        <label>Login Type</label>
+        <select id="role-select">
+          <option value="user">User Login</option>
+          <option value="admin">Admin Login</option>
+        </select>
+      </div>
+
+      <div id="admin-pass-box" style="display:none;">
+        <label>Admin Password</label>
+        <input id="admin-pass" type="password" placeholder="Passcode enter karein" />
+      </div>
+
+      <button class="btn" id="go">Aage Badhein</button>
+      ${error ? `<div class="err">${esc(error)}</div>` : ""}
+    </div>`;
+
+    document.getElementById("role-select").onchange = (e) => {
+      document.getElementById("admin-pass-box").style.display = e.target.value === "admin" ? "block" : "none";
+    };
+
     document.getElementById("go").onclick = async () => {
       const name = document.getElementById("name").value.trim();
-      if (!name) return;
-      try { await join(name); } catch (e) { error = e.message; render(); }
+      const role = document.getElementById("role-select").value;
+      const pass = document.getElementById("admin-pass").value;
+
+      if (!name) return alert("Naam likhein!");
+      if (role === "admin" && pass !== ADMIN_PASS) return alert("Galat Admin Password!");
+
+      try { await join(name, role); } catch (e) { error = e.message; render(); }
     };
     return;
   }
+
+  // MAIN BODY Content Tabs
   let body = "";
+  
   if (tab === "chat") {
     body = messages.map((m) => {
       if (m.type === "system") return `<div class="sys">${esc(m.text)}</div>`;
@@ -242,45 +399,142 @@ function render() {
         return match ? cardHtml(match) : "";
       }
       const mine = m.userId === me.id;
-      return `<div class="bubble ${mine ? "me" : ""}">${mine ? "" : `<div class="who">${esc(m.name)}</div>`}${esc(m.text)}<span class="time">${time(m.at)}</span></div>`;
-    }).join("") || `<div class="sys">Group khali hai. Pehla message bhejo.</div>`;
+      return `<div class="bubble ${mine ? "me" : ""}">
+        ${mine ? "" : `<div class="who">${esc(m.name)}</div>`}
+        ${esc(m.text)}
+        <span class="time">${time(m.at)}</span>
+      </div>`;
+    }).join("") || `<div class="sys">Koi conversation nahi hai. Chat shuru karein.</div>`;
   }
+
   if (tab === "matches") {
-    body = matches.length ? matches.map((m) => `<div class="list-item">${cardHtml(m)}</div>`).join("") : `<div class="sys">Abhi koi match nahi.</div>`;
+    body = matches.length ? matches.map((m) => `<div class="list-item">${cardHtml(m)}</div>`).join("") : `<div class="sys">Koi active match nahi hai.</div>`;
   }
+
+  if (tab === "wallet") {
+    const myTx = me.role === "admin" ? txList : txList.filter(t => t.userId === me.id);
+    body = `
+      <div class="list-item">
+        <div class="row">
+          <strong>🪙 Aapka Balance:</strong>
+          <strong style="color:var(--gold); font-size:18px;">${me.coins} Coins</strong>
+        </div>
+        ${me.role !== "admin" ? `
+        <div class="row" style="margin-top:8px;">
+          <button class="btn green small" id="open-dep">Add Coins (Deposit)</button>
+          <button class="btn gold small" id="open-wit">Withdraw</button>
+        </div>` : ''}
+      </div>
+
+      <h3 style="margin:10px 0 4px; font-size:14px;">${me.role === "admin" ? "All User Requests (Admin View)" : "Transaction History"}</h3>
+      ${myTx.length ? myTx.map(t => `
+        <div class="list-item">
+          <div class="row">
+            <strong>${t.type.toUpperCase()} - 🪙 ${t.amount} Coins</strong>
+            <span class="pill ${t.status}">${t.status}</span>
+          </div>
+          <span class="note">User: ${esc(t.userName)} | Details/UTR: ${esc(t.utr \vert{}\vert{} t.details \vert{}\vert{} '-')}</span>${me.role === "admin" && t.status === "pending" ? `
+            <div class="row" style="margin-top:6px;">
+              <button class="btn green small" data-tx="${t.id}" data-approve="true">Approve</button>
+              <button class="btn red small" data-tx="${t.id}" data-approve="false">Reject</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join("") : '<div class="sys">Koi transaction record nahi hai.</div>'}
+    `;
+  }
+
   if (tab === "support") {
-    body = `<div class="list-item"><strong>Online</strong><span class="note">${members.map((m) => esc(m.name)).join(", ") || "koi nahi"}</span></div>
-      <div class="list-item"><strong>Room code</strong><span class="note">Ludo King se code copy karke yahan paste karo. Opponent Copy dabayega.</span></div>
-      <div class="list-item"><strong>Rules</strong><span class="note">Yeh social chat hai. Entry fee, pot, ya payout yahan nahi hai.</span></div>`;
+    body = `
+      <div class="list-item">
+        <strong>Online Users (${members.length})</strong>
+        <span class="note">${members.map((m) => esc(m.name)).join(", ") || "Koi nahi"}</span>
+      </div>
+      <div class="list-item">
+        <strong>Help & Rules</strong>
+        <span class="note">1. Room code host dwara Ludo app se copy karke yahan daala jayega.</span>
+        <span class="note">2. Coin Add/Withdrawal request admin dwara verify ki jayegi.</span>
+      </div>`;
   }
-  const sheetHtml = sheet ? `<div class="sheet"><form id="ch"><strong>Challenge card</strong>
-      <div><label>Game</label><select id="game">${GAMES.map((g) => `<option>${g}</option>`).join("")}</select></div>
+
+  // MODAL / SHEETS
+  let sheetHtml = "";
+  if (sheet === "challenge") {
+    sheetHtml = `<div class="sheet"><form id="ch-form">
+      <strong>New Challenge Create Karein</strong>
+      <div><label>Select Game</label><select id="game">${GAMES.map((g) => `<option>${g}</option>`).join("")}</select></div>
       <div><label>Mode</label><select id="mode">${MODES.map((g) => `<option>${g}</option>`).join("")}</select></div>
-      <div><label>Note</label><input id="note" maxlength="80" placeholder="2 player" /></div>
-      <div class="row"><button type="button" class="btn ghost" id="close">Band</button><button class="btn" type="submit">Create challenge</button></div>
-    </form></div>` : "";
-  root.innerHTML = `<header class="top"><div class="ava">${esc(me.name.slice(0, 1))}</div><div><h2>JokerLudo</h2><small>${members.length} online · social, no stakes</small></div></header>
+      <div><label>Coin Amount</label><input type="number" id="coins" placeholder="0" /></div>
+      <div><label>Note / Rule</label><input id="note" maxlength="80" placeholder="Ex. 2 Player classic" /></div>
+      <div class="row"><button type="button" class="btn ghost" id="close-sheet">Cancel</button><button class="btn" type="submit">Challenge Bhejein</button></div>
+    </form></div>`;
+  } else if (sheet === "deposit") {
+    sheetHtml = `<div class="sheet"><form id="dep-form">
+      <strong>Add Coins (Deposit Request)</strong>
+      <span class="note">UPI / Payment ke baad UTR number submit karein.</span>
+      <div><label>Coins / Amount (₹)</label><input type="number" id="dep-amt" placeholder="100" required /></div>
+      <div><label>UTR / Transaction ID</label><input id="dep-utr" placeholder="12 digit UTR Number" required /></div>
+      <div class="row"><button type="button" class="btn ghost" id="close-sheet">Cancel</button><button class="btn green" type="submit">Submit Request</button></div>
+    </form></div>`;
+  } else if (sheet === "withdraw") {
+    sheetHtml = `<div class="sheet"><form id="wit-form">
+      <strong>Coins Withdraw Request</strong>
+      <div><label>Coins Amount</label><input type="number" id="wit-amt" placeholder="100" required /></div>
+      <div><label>UPI ID / Payment Detail</label><input id="wit-upi" placeholder="example@upi" required /></div>
+      <div class="row"><button type="button" class="btn ghost" id="close-sheet">Cancel</button><button class="btn gold" type="submit">Withdraw Request</button></div>
+    </form></div>`;
+  }
+
+  root.innerHTML = `
+    <header class="top">
+      <div class="user-info">
+        <div class="ava">${esc(me.name.slice(0, 1))}</div>
+        <div>
+          <h2>${esc(me.name)} ${me.role === "admin" ? '<span class="admin-badge">ADMIN</span>' : ''}</h2>
+          <small>${members.length} online</small>
+        </div>
+      </div>
+      <div class="wallet-badge">🪙 ${me.coins}</div>
+    </header>
+
     <main id="feed">${error ? `<div class="err">${esc(error)}</div>` : ""}${body}</main>
-    ${tab === "chat" ? `<div class="composer"><input id="text" placeholder="Message" maxlength="400" /><button class="btn ghost" id="open-ch">Challenge</button><button class="btn" id="send">Send</button></div>` : ""}
+
+    ${tab === "chat" ? `
+      <div class="composer">
+        <input id="text" placeholder="Message..." maxlength="400" />
+        <button class="btn ghost" style="width:auto;" id="open-ch">Challenge</button>
+        <button class="btn" style="width:auto;" id="send">Send</button>
+      </div>` : ""}
+
     <nav class="bot">
-      <button data-tab="chat" class="${tab === "chat" ? "on" : ""}">Chat</button>
-      <button data-tab="matches" class="${tab === "matches" ? "on" : ""}">Matches</button>
-      <button data-tab="support" class="${tab === "support" ? "on" : ""}">Support</button>
-    </nav>${sheetHtml}`;
+      <button data-tab="chat" class="${tab === "chat" ? "on" : ""}">💬 Chat</button>
+      <button data-tab="matches" class="${tab === "matches" ? "on" : ""}">⚔️ Matches</button>
+      <button data-tab="wallet" class="${tab === "wallet" ? "on" : ""}">🪙 Wallet</button>
+      <button data-tab="support" class="${tab === "support" ? "on" : ""}">ℹ️ Support</button>
+    </nav>
+    ${sheetHtml}`;
+
   const feed = document.getElementById("feed");
   if (feed) feed.scrollTop = feed.scrollHeight;
+
+  // TAB EVENTS
   root.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { tab = b.dataset.tab; render(); });
-  const open = document.getElementById("open-ch");
-  if (open) open.onclick = () => { sheet = true; render(); };
-  const close = document.getElementById("close");
-  if (close) close.onclick = () => { sheet = false; render(); };
-  const form = document.getElementById("ch");
-  if (form) form.onsubmit = async (e) => {
-    e.preventDefault();
-    sheet = false;
-    tab = "chat";
-    await createChallenge(document.getElementById("game").value, document.getElementById("mode").value, document.getElementById("note").value);
-  };
+
+  // SHEET CLOSE
+  const closeBtn = document.getElementById("close-sheet");
+  if (closeBtn) closeBtn.onclick = () => { sheet = null; render(); };
+
+  // OPEN MODALS
+  const openCh = document.getElementById("open-ch");
+  if (openCh) openCh.onclick = () => { sheet = "challenge"; render(); };
+
+  const openDep = document.getElementById("open-dep");
+  if (openDep) openDep.onclick = () => { sheet = "deposit"; render(); };
+
+  const openWit = document.getElementById("open-wit");
+  if (openWit) openWit.onclick = () => { sheet = "withdraw"; render(); };
+
+  // CHAT SEND
   const sendBtn = document.getElementById("send");
   if (sendBtn) sendBtn.onclick = async () => {
     const input = document.getElementById("text");
@@ -289,6 +543,42 @@ function render() {
     input.value = "";
     await sendChat(text);
   };
+
+  // FORM SUBMITS
+  const chForm = document.getElementById("ch-form");
+  if (chForm) chForm.onsubmit = async (e) => {
+    e.preventDefault();
+    sheet = null;
+    await createChallenge(
+      document.getElementById("game").value,
+      document.getElementById("mode").value,
+      document.getElementById("coins").value,
+      document.getElementById("note").value
+    );
+  };
+
+  const depForm = document.getElementById("dep-form");
+  if (depForm) depForm.onsubmit = async (e) => {
+    e.preventDefault();
+    sheet = null;
+    await requestDeposit(document.getElementById("dep-amt").value, document.getElementById("dep-utr").value);
+  };
+
+  const witForm = document.getElementById("wit-form");
+  if (witForm) witForm.onsubmit = async (e) => {
+    e.preventDefault();
+    sheet = null;
+    await requestWithdraw(document.getElementById("wit-amt").value, document.getElementById("wit-upi").value);
+  };
+
+  // ADMIN ACTION BUTTONS
+  root.querySelectorAll("[data-tx]").forEach((b) => b.onclick = async () => {
+    const tx = txList.find((t) => t.id === b.dataset.tx);
+    const approve = b.dataset.approve === "true";
+    if (tx) await processTx(tx, approve);
+  });
+
+  // CARD ACTION BUTTONS
   root.querySelectorAll("[data-act]").forEach((b) => b.onclick = async () => {
     const match = matches.find((m) => m.id === b.dataset.id);
     if (b.dataset.act === "copy") {
@@ -298,7 +588,7 @@ function render() {
     if (b.dataset.act === "accept") return accept(match);
     if (b.dataset.act === "code") return shareCode(match, document.getElementById("code-" + match.id).value);
     if (b.dataset.act === "done") return finish(match, "done");
-    if (b.dataset.act === "cancel") return finish(match, "cancelled");
+    if (b.dataset.act === "cancel") return finish(match, "cancel");
   });
 }
 
