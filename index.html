@@ -101,10 +101,10 @@ function uid() {
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"]/g, (c) => {
-    if (c === "&") return "\u0026amp;";
-    if (c === "<") return "\u0026lt;";
-    if (c === ">") return "\u0026gt;";
-    return "\u0026quot;";
+    if (c === "&") return "&amp;";
+    if (c === "<") return "&lt;";
+    if (c === ">") return "&gt;";
+    return "&quot;";
   });
 }
 function time(ts) {
