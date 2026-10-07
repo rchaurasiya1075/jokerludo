@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/main/{doc=**} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAny(['type', 'name', 'game', 'status', 'lastSeen'])
+        && !request.resource.data.keys().hasAny(['amount', 'stake', 'wallet', 'payout', 'commission', 'utr']);
+      allow delete: if false;
+    }
+  }
+}
